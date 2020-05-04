@@ -76,18 +76,7 @@ class HashTable:
         else:
             entry = HashTableEntry(key, value)
             self.storage[index] = entry
-        # entry = HashTableEntry(key, value)
-        #
-        #
-        # if self.storage[index] is None:
-        #     self.storage[index] = entry
-        # else:
-        #     found_entry = self.storage[index]
-        #     while found_entry.next is not None:
-        #         if found_entry.key == key:
-        #             found_entry.value = value
-        #         found_entry = found_entry.next
-        #     found_entry.next = entry
+
 
 
     def delete(self, key):
@@ -98,6 +87,22 @@ class HashTable:
 
         Implement this.
         """
+        index = self.hash_index(key)
+        # Grab the entry
+        entry = self.storage[index]
+        # Check if key matches entry.key
+        if entry.key == key:
+            if entry.next is None:
+                self.storage[index] = None
+            else:
+                self.storage[index] = entry.next
+        else:
+            print(f'else called, entry.key: {entry.key}, entry.value: {entry.value}, entry.next: {entry.next}')
+            if entry.next is not None:
+                if entry.next.key == key:
+                    entry.next = None
+        # check to see if there is a next
+        # If there is, create a new Instance and loop through instance till entry.next is none
 
 
 
@@ -112,13 +117,13 @@ class HashTable:
         index = self.hash_index(key)
         value = None
         entry = self.storage[index]
-        while entry.key != key and entry.next is not None:
+        while entry is not None and entry.key != key and entry.next is not None:
             if entry.key == key:
                 value = entry.value
             else:
                 entry = entry.next
         # Check Last Entry
-        if entry.key == key:
+        if entry is not None and entry.key == key:
             value = entry.value
         return value
 
@@ -129,6 +134,15 @@ class HashTable:
 
         Implement this.
         """
+        old_storage = self.storage
+        self.capacity = self.capacity * 2
+        self.storage = [None] * self.capacity
+        for list in old_storage:
+            entry = list
+            while entry.next is not None:
+                self.put(entry.key, entry.value)
+                entry = entry.next
+            self.put(entry.key, entry.value)
 
 if __name__ == "__main__":
     ht = HashTable(2)
@@ -143,6 +157,7 @@ if __name__ == "__main__":
     print(ht.get("line_1"))
     print(ht.get("line_2"))
     print(ht.get("line_3"))
+    print(ht.get("exist"))
 
     # Test resizing
     old_capacity = len(ht.storage)
