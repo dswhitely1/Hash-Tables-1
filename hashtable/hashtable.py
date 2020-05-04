@@ -17,6 +17,9 @@ class HashTable:
     Implement this.
     """
 
+    def __init__(self, capacity):
+        self.capacity = capacity
+
     def fnv1(self, key):
         """
         FNV-1 64-bit hash function
