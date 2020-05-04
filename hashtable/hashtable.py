@@ -19,6 +19,7 @@ class HashTable:
 
     def __init__(self, capacity):
         self.capacity = capacity
+        self.storage = [None] * capacity
 
     def fnv1(self, key):
         """
@@ -33,6 +34,11 @@ class HashTable:
 
         Implement this, and/or FNV-1.
         """
+        hash_number = 5381
+        for letter in key:
+            hash_number = (hash_number << 5) + hash_number + ord(letter)
+
+        return hash_number
 
     def hash_index(self, key):
         """
@@ -50,6 +56,17 @@ class HashTable:
 
         Implement this.
         """
+        index = self.hash_index(key)
+        print(index)
+        entry = HashTableEntry(key, value)
+        if self.storage[index] is None:
+            self.storage[index] = entry
+        else:
+            found_entry = self.storage[index]
+            while found_entry.next is not None:
+                found_entry = found_entry.next
+            found_entry.next = entry
+
 
     def delete(self, key):
         """
@@ -60,6 +77,8 @@ class HashTable:
         Implement this.
         """
 
+
+
     def get(self, key):
         """
         Retrieve the value stored with the given key.
@@ -68,6 +87,18 @@ class HashTable:
 
         Implement this.
         """
+        index = self.hash_index(key)
+        value = None
+        entry = self.storage[index]
+        while entry.key != key and entry.next is not None:
+            if entry.key == key:
+                value = entry.value
+            else:
+                entry = entry.next
+        # Check Last Entry
+        if entry.key == key:
+            value = entry.value
+        return value
 
     def resize(self):
         """
