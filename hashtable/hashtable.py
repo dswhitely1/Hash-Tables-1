@@ -57,15 +57,37 @@ class HashTable:
         Implement this.
         """
         index = self.hash_index(key)
-        print(index)
-        entry = HashTableEntry(key, value)
-        if self.storage[index] is None:
-            self.storage[index] = entry
+        if self.storage[index] is not None:
+            found_entry = None
+            entry = self.storage[index]
+            while entry.next is not None:
+                if entry.key == key:
+                    found_entry = entry
+                entry = entry.next
+            # Check if Entry is only one in hash table
+            if found_entry is None and entry.key == key:
+                found_entry = entry
+            if found_entry is None:
+                new_entry = HashTableEntry(key, value)
+                entry.next = new_entry
+            else:
+                print(f'Found Value {found_entry.value}')
+                found_entry.value = value
         else:
-            found_entry = self.storage[index]
-            while found_entry.next is not None:
-                found_entry = found_entry.next
-            found_entry.next = entry
+            entry = HashTableEntry(key, value)
+            self.storage[index] = entry
+        # entry = HashTableEntry(key, value)
+        #
+        #
+        # if self.storage[index] is None:
+        #     self.storage[index] = entry
+        # else:
+        #     found_entry = self.storage[index]
+        #     while found_entry.next is not None:
+        #         if found_entry.key == key:
+        #             found_entry.value = value
+        #         found_entry = found_entry.next
+        #     found_entry.next = entry
 
 
     def delete(self, key):
@@ -114,7 +136,7 @@ if __name__ == "__main__":
     ht.put("line_1", "Tiny hash table")
     ht.put("line_2", "Filled beyond capacity")
     ht.put("line_3", "Linked list saves the day!")
-
+    ht.put("line_3", "Successful ReWrite")
     print("")
 
     # Test storing beyond capacity
