@@ -1,14 +1,22 @@
 import math
 import random
+from applications.hashtable.hash_table import HashTable
+
+ht = HashTable(8)
 
 def slowfun(x, y):
     # TODO: Modify to produce the same results, but much faster
-    v = math.pow(x, y)
-    v = math.factorial(v)
-    v //= (x + y)
-    v %= 982451653
-
-    return v
+    key = str(x)+str(y)
+    value = ht.get(key)
+    if value is not None:
+        return value
+    else:
+        v = math.pow(x, y)
+        v = math.factorial(v)
+        v //= (x + y)
+        v %= 982451653
+        ht.put(key, v)
+        return v
 
 
 # Do not modify below this line!
