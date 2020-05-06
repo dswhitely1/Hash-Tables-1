@@ -18,7 +18,6 @@ class DoublyLinkedList:
             self.tail.next = new_entry
             self.tail = new_entry
 
-
     def find_node(self, key):
         cur = self.head
         while cur is not None:
@@ -26,7 +25,6 @@ class DoublyLinkedList:
                 return cur
             cur = cur.next
         return None
-
 
     def delete(self, node):
         self.length -= 1
@@ -41,7 +39,6 @@ class DoublyLinkedList:
             node.delete()
         else:
             node.delete()
-
 
 
 class HashTableEntry:
@@ -83,8 +80,9 @@ class HashTable:
     """
 
     def __init__(self, capacity):
-        self.capacity = capacity
-        self.storage = [DoublyLinkedList()] * capacity
+        self.capacity = capacity if capacity > 7 else 8
+        self.storage = [None] * capacity
+        self.items = 0
 
     def fnv1(self, key):
         """
@@ -110,8 +108,12 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        #return self.fnv1(key) % self.capacity
+        # return self.fnv1(key) % self.capacity
         return self.djb2(key) % self.capacity
+
+    def save(self, node_list, key, value):
+        node_list.add_to_list(key, value)
+        self.items += 1
 
     def put(self, key, value):
         """
@@ -121,20 +123,21 @@ class HashTable:
 
         Implement this.
         """
+        load = self.items / self.capacity
+        if load > .7:
+            self.resize(self.capacity * 2)
         index = self.hash_index(key)
+        if self.storage[index] is None:
+            self.storage[index] = DoublyLinkedList()
         dll_list = self.storage[index]
         if dll_list.head is None:
-            dll_list.add_to_list(key, value)
-        elif dll_list.head is dll_list.tail:
-            dll_list.add_to_list(key, value)
+            self.save(dll_list, key, value)
         else:
             found = dll_list.find_node(key)
             if found:
                 found.value = value
             else:
-                dll_list.add_to_list(key, value)
-
-
+                self.save(dll_list, key, value)
 
     def delete(self, key):
         """
@@ -148,9 +151,13 @@ class HashTable:
         node = self.storage[index].find_node(key)
         if node:
             self.storage[index].delete(node)
+            self.items -= 1
+            load = self.items / self.capacity
+            if load < .2:
+                new_capacity = self.capacity // 2
+                self.resize(new_capacity if new_capacity > 7 else 8)
         else:
             print(f'{key} was not found')
-
 
     def get(self, key):
         """
@@ -161,7 +168,9 @@ class HashTable:
         Implement this.
         """
         index = self.hash_index(key)
-        found = self.storage[index].find_node(key)
+        found = None
+        if self.storage[index] is not None:
+            found = self.storage[index].find_node(key)
         if found:
             return found.value
         else:
@@ -187,6 +196,18 @@ class HashTable:
 
         Implement this.
         """
+        old_storage = self.storage
+        self.capacity = new_capacity
+        self.items = 0
+        self.storage = [None] * self.capacity
+        for i in range(len(old_storage)):
+            if old_storage[i] is not None:
+                cur = old_storage[i].head
+                while cur is not None:
+                    key, value = cur.key, cur.value
+                    self.put(key, value)
+                    cur = cur.next
+
 
 
 if __name__ == "__main__":
